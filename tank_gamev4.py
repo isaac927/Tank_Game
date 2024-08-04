@@ -2,28 +2,46 @@ import pygame
 import math
 import random
 
+# Initialize Pygame
 pygame.init()
 pygame.font.init()
 
+
+# Screen dimensions
 Wscreen = 1200
 Hscreen = 600
+
+# Set up display
 win = pygame.display.set_mode((Wscreen,Hscreen))
+
+# Load fonts
 text_font = pygame.font.Font("Tank game\press-start-2p-font\PressStart2P-vaV7.ttf",30)
 tutorial_font = pygame.font.Font("Tank game\press-start-2p-font\PressStart2P-vaV7.ttf",25)
 Menu_font = pygame.font.Font("Tank game/press-start-2p-font/PressStart2P-vaV7.ttf", 50)
+
+# Set up clock for FPS
 clock = pygame.time.Clock()
+
+# Button dimensions
 BUTTON_WIDTH = 500
 BUTTON_HEIGHT = 100
+
+# Color definitions
 WHITE = (255, 255, 255)
 BLACK = (0,0, 0)
+
+# Load and scale button image
 button_image = pygame.image.load('Tank game/sprites/button.png')
 button_image = pygame.transform.scale(button_image, (BUTTON_WIDTH, BUTTON_HEIGHT))
+
+# Load and scale cloud images
 cloud_1_image = pygame.image.load('Tank game/sprites/cloud_1.png')
 cloud_2_image = pygame.image.load('Tank game/sprites/cloud_2.png')
 cloud_1_image=pygame.transform.scale(cloud_1_image,(Wscreen,Hscreen))
 cloud_2_image=pygame.transform.scale(cloud_2_image,(Wscreen,Hscreen))
 
-        
+
+# Button class definition
 class Button:
         def __init__(self, x, y, image, text):
             self.image = image
@@ -44,21 +62,21 @@ class Button:
             return self.rect.collidepoint(pos)       
 
 
-
+# Function to draw text on the screen
 def draw_text(text, font, color, x , y):
     text_O = font.render(text,True,color)
     text_rect = text_O.get_rect()
     text_rect.center=(x,y)
     win.blit(text_O,text_rect)
 
-
+# Function to get the high score from a file
 def get_high_score():
     with open("Tank game/highscore.txt","r") as file:
         return int(file.read())
 
         
         
-
+# Function to display the tutorial screen
 def tutorial_screen():
     pygame.display.set_caption('Tutorial')
     understand_button = Button(Wscreen / 2 - BUTTON_WIDTH / 2, Hscreen - 200 , button_image, 'OK!')
@@ -105,16 +123,18 @@ def tutorial_screen():
 
 
 
-
+# Function to run the main game
 def game():
     pygame.display.set_caption('Game')
     clock = pygame.time.Clock()
 
+
+    # Tank dimensions
     tank_width = 50
     tank_height = 20
-
+        
+    # Other Variabels for calculations
     vel = 1
-
     x = 0
     y = 0
     angle = 0
@@ -125,18 +145,19 @@ def game():
     angle_movement_vercinity = math.pi/180
     gravity = -5.5
     ground_level=30
+    # Gameplay variable
     score = 0
     combo = 0
     
 
 
-
+# Set up fence and ground
     fence = pygame.Rect(Wscreen/5,Hscreen-ground_level-40,20,40)
     ground_image = pygame.image.load("Tank game/sprites/GRASS.png")
     ground_image = pygame.transform.scale(ground_image , (Wscreen,ground_level))
 
 
-    class tank():
+    class tank():# Tank class definition
         def __init__(self, x, y, barrel_image_path, tank_body_path):
             self.body_width = 50
             self.body_height = 20
@@ -170,7 +191,7 @@ def game():
             self.body_rect.x += vel
                                 
             
-    class buldings(object):
+    class buldings(object):# Buildings class definition
         def __init__(self,y,image_path):
             self.x = random.randint(Wscreen/5+20,1200-21)
             self.y = y
@@ -189,7 +210,7 @@ def game():
             redrawwindow()
         
 
-    class cloud():
+    class cloud():# Cloud class definition
         def __init__(self,cloud_1_path,cloud_2_path):
             self.cloud_1=pygame.image.load(cloud_1_path)
             self.cloud_2=pygame.image.load(cloud_2_path)
@@ -212,7 +233,7 @@ def game():
 
         
         
-    class bullet(object):
+    class bullet(object):# Bullet class definition
         def __init__(self, x, y, radius, color):
             self.x = x
             self.y = y
@@ -222,7 +243,7 @@ def game():
         def draw(self, win):
             pygame.draw.circle(win, (0,0,0), (self.x,self.y), self.radius)
         
-        def path(startx,starty,power,angle,time):
+        def path(startx,starty,power,angle,time):# Calculations for the bullet's tradectory
             velx = math.cos(angle) * power
             vely = math.sin(angle) * power
 
@@ -235,8 +256,10 @@ def game():
 
             return (newx, newy)
 
+
+        
     clouds=cloud("Tank game\sprites\cloud_1.png","Tank game\sprites\cloud_2.png")
-    def redrawwindow():  
+    def redrawwindow():  # Function to draw all elements on the screen
         win.fill((100, 173, 217))
         clouds.draw()
         win.blit(ground_image, (0,Hscreen-ground_level))
@@ -252,7 +275,7 @@ def game():
         clouds.move_cloud()
         pygame.display.update()
 
-    def countdown():
+    def countdown(): # Countdown Screen before game starts
         win.fill(BLACK)
         draw_text(f'''3''', text_font, (255,255,255), Wscreen/2,Hscreen/2)
         pygame.display.update()
@@ -271,7 +294,7 @@ def game():
         pygame.time.delay(500)
 
 
-    def game_over():
+    def game_over(): #game over screen after game ends
         win.fill(BLACK)
         draw_text(f'''TIME!''', text_font, (255,255,255), Wscreen/2,Hscreen/2)
         pygame.display.update()
@@ -294,7 +317,7 @@ def game():
         pygame.display.update()
         
 
-    def high_score_change():
+    def high_score_change(): #changes high score is it is higher than old high score
         with open("Tank game/highscore.txt","r") as file:
             if int(file.read())<score:
                 with open("Tank game/highscore.txt","w") as file:
@@ -305,7 +328,8 @@ def game():
 
 
     
-    timer_left = 60
+    timer_left = 60 #time left
+        # all main aspect of the game loaded
     player = tank(Wscreen/8,Hscreen-20-ground_level,"Tank game/sprites/Barrel.png","Tank game/sprites/Tank_body.png")
     normal_bullet = bullet(player.body.x+tank_width/2 , player.body.y+tank_height/2 ,2,(0,0,0))
     building = buldings(Hscreen-ground_level-66,"Tank game\sprites\city.png")
@@ -318,21 +342,21 @@ def game():
         redrawwindow()
 
         if shoot == True:
-            time += 0.1
+            time += 0.1 #Bullet travel
             position = bullet.path(x,y,power,angle,time)
             normal_bullet.x = position[0] #position is a list, like x,y, like [x,y], so im getting the x position in the list with 0
             normal_bullet.y = position[1]
-            if normal_bullet.y >= Hscreen - normal_bullet.radius-ground_level:               
+            if normal_bullet.y >= Hscreen - normal_bullet.radius-ground_level:  #collision with the ground             
                 shoot = False                           
                 normal_bullet.x = player.body.x+tank_width/2
                 normal_bullet.y = player.body.y+tank_height/2
                 combo = 0
-            elif normal_bullet.x+normal_bullet.radius >= Wscreen/5 and normal_bullet.y+normal_bullet.radius >= Hscreen-ground_level-40 and normal_bullet.x<=Wscreen/5+20:
+            elif normal_bullet.x+normal_bullet.radius >= Wscreen/5 and normal_bullet.y+normal_bullet.radius >= Hscreen-ground_level-40 and normal_bullet.x<=Wscreen/5+20: #collision with the fence
                 shoot = False
                 normal_bullet.x = player.body.x+tank_width/2
                 normal_bullet.y = player.body.y+tank_height/2     
                 combo = 0    
-            elif normal_bullet.x+normal_bullet.radius >= building.x and normal_bullet.x<=building.x+128 and normal_bullet.y+normal_bullet.radius >= Hscreen-ground_level-69:               
+            elif normal_bullet.x+normal_bullet.radius >= building.x and normal_bullet.x<=building.x+128 and normal_bullet.y+normal_bullet.radius >= Hscreen-ground_level-69: #collision with the buldings          
                 shoot = False       
                 normal_bullet.x = player.body.x+tank_width/2
                 normal_bullet.y = player.body.y+tank_height/2
@@ -347,7 +371,7 @@ def game():
         
         
 
-
+        # Inputs
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -408,7 +432,7 @@ def game():
     
 
 
-
+# Menu definition
 def menu():
     
     logo_image = pygame.image.load("Tank game/sprites/Logo.png")
@@ -473,5 +497,5 @@ def menu():
             pass
         redrawscreen()
         
-
+# Runs the programm
 menu()
